@@ -7,12 +7,15 @@ public class Die {
     private static Random generator = new Random();
     private int value;
     private boolean rollable;
+    private boolean selected;
     private int rolls;
+
 
     public Die(int rolls){
         value = 0;
         rollable=true;
         this.rolls = rolls;
+        selected = true;
     }
 
     public int roll(){
@@ -37,4 +40,12 @@ public class Die {
 
     public boolean isRollable() {return rollable;}
     public int getValue(){return value;}
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

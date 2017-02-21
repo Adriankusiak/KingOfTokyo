@@ -6,7 +6,6 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class Communicator{
-    private String signature;
     private byte[] received = new byte[1024];
     private boolean receivedFlag = false;
     private DatagramPacket receivePacket = new DatagramPacket(received, received.length);
@@ -18,11 +17,10 @@ public class Communicator{
     private int outgoingPort = 9877;
     private ServerSocket hostSocket;
 
-    public Communicator(String IP, String signature) throws IOException{
-        this.signature = signature;
+    public Communicator(Boolean client, String IP) throws IOException{
 
 
-        if(!IP.equals("fc")){
+        if(client){
             IPAddress = InetAddress.getByName(IP);
             sendPort = 9876;
             outgoingPort = 9875;
@@ -37,11 +35,6 @@ public class Communicator{
             }});
         }
 
-    }
-
-
-    public void setIP(String IP) throws UnknownHostException{
-        IPAddress = InetAddress.getByName(IP);
     }
 
 
@@ -105,5 +98,29 @@ public class Communicator{
     public ArrayList<GameAction> getActions() {
         ArrayList<GameAction> actionStack= new ArrayList<>();
         return actionStack;
+    }
+
+    public void informAllEndTurn() {
+    }
+
+    public void informEndTurn() {
+    }
+
+    public void informAllSelect() {
+    }
+
+    public void informSelect() {
+    }
+
+    public void informAllRoll(ArrayList<Integer> vals) {
+    }
+
+    public void informRoll(ArrayList<Integer> vals) {
+    }
+
+    public void informAllResolve(int[] vals) {
+    }
+
+    public void informResolve(int[] vals) {
     }
 }

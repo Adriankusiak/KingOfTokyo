@@ -8,6 +8,8 @@ public class Player {
     private int life;
     private int maxLife;
     private boolean isAlive;
+    private boolean inTokyo;
+    private int diceCount;
 
     public Player(String name, String character, int startingEnergy, int startingLife, int maxLife){
         this.name = name;
@@ -16,6 +18,8 @@ public class Player {
         this.life = startingLife;
         this.maxLife = maxLife;
         this.isAlive = true;
+        this.inTokyo = false;
+        this.diceCount = 6;
     }
 
     public void useEnergy(int toUse){
@@ -66,5 +70,12 @@ public class Player {
 
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public int getDiceCount() {
+        return diceCount;
+    }
+    public void setDiceCount(int count) {
+        diceCount = count;
     }
 }

@@ -1,0 +1,17 @@
+[
+  {
+  "title": "test",
+  "cost": "1",
+  "description": "Test card",
+  "type": "keep",
+  "onDamage": "function(gameState){}",
+  "onAttack": "function(gameState){}",
+  "onRoll": "function(gameState){}",
+  "onHealthGain": "function(gameState){}",
+  "onPointGain": "function(gameState){}",
+  "onEnergyGain": "function(gameState){}",
+  "onMove": "function(gameState){}",
+  "onTurnStart": "function(gameState){}",
+  "onTurnEnd": "function(gameState){}"
+  }
+]

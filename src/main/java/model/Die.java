@@ -15,7 +15,7 @@ public class Die {
         value = 0;
         rollable=true;
         this.rolls = rolls;
-        selected = true;
+        selected = false;
     }
 
     public int roll(){
@@ -26,13 +26,19 @@ public class Die {
     }
 
     private void checkRollable() {
-        rollable = (rolls==0)?false:true;
+        rollable = rolls>0;
     }
 
     public void addRoll(){
         rolls+=1;
         checkRollable();
     }
+
+    public void subRoll(){
+        rolls-=1;
+        checkRollable();
+    }
+
     public void setRolls(int val){
         rolls = val;
         checkRollable();
@@ -48,4 +54,6 @@ public class Die {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+
 }

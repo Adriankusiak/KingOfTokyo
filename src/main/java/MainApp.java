@@ -17,8 +17,10 @@ public class MainApp extends Application
         GameBoard gameBoard = new GameBoard();
 
         new GameController(gameBoard, new Game());
-
-        primaryStage.setScene(new Scene(gameBoard));
+        String css = this.getClass().getResource("/style.css").toExternalForm();
+        Scene scene = new Scene(gameBoard);
+        scene.getStylesheets().add(css);
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }

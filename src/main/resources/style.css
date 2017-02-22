@@ -1,0 +1,22 @@
+#dieButton{
+    -fx-background-radius: 5em;
+    -fx-min-width: 75px;
+    -fx-min-height: 75px;
+    -fx-max-width: 75px;
+    -fx-max-height: 75px;
+    -fx-background-color: -fx-body-color;
+    -fx-background-insets: 0px;
+    -fx-padding: 0px;
+}
+
+#dieButton:selected{
+    -fx-background-radius: 5em;
+    -fx-min-width: 75px;
+    -fx-min-height: 75px;
+    -fx-max-width: 75px;
+    -fx-max-height: 75px;
+    -fx-background-color: -fx-body-color;
+    -fx-background-insets: 0px;
+    -fx-padding: 0px;
+    -fx-body-color: crimson;
+}

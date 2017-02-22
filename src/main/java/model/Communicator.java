@@ -123,4 +123,10 @@ public class Communicator{
 
     public void informResolve(int[] vals) {
     }
+
+    public void informUnselect() {
+    }
+
+    public void informAllUnselect() {
+    }
 }

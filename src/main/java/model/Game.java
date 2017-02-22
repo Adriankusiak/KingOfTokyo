@@ -7,6 +7,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Game {
     private ArrayList<Player> players;
@@ -59,9 +60,15 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        newGame(4, 3, 0, 0,
+               new ArrayList<String>(Arrays.asList("Adrian", "Córdoba", "La Plata")),
+               new ArrayList<String>(Arrays.asList("Grizzly", "Cthullu", "blash")),
+                0, 10, 12);
     }
 
     public void newGame(int maxPoints, int playerCount, int localPlayer, int startingPlayer, ArrayList<String> names, ArrayList<String> characters, int startingEnergy, int startingLife, int maxLife){
+        players = new ArrayList<>();
         for(int i = 0; i < playerCount; ++i){
             players.add(new Player(names.get(i),  characters.get(i), startingEnergy, startingLife, maxLife));
         }
@@ -80,12 +87,23 @@ public class Game {
         else communicator.informSelect();
     }
 
+    public void unselectDice(int i){
+        dice.get(i).setSelected(false);
+        if(hosting) communicator.informAllUnselect();
+        else communicator.informUnselect();
+    }
+
     public ArrayList<Integer> rollSelected(){
         ArrayList<Integer> vals = new ArrayList<>();
         for(int i = 0; i < currentPlayer.getDiceCount(); ++i){
             Die d = dice.get(i);
             if(d.isSelected() && d.isRollable()) vals.add(d.roll());
-            else vals.add(d.getValue());
+            else{
+                vals.add(d.getValue());
+                d.subRoll();
+            }
+            d.setSelected(false);
+
         }
         if(hosting) communicator.informAllRoll(vals);
         else communicator.informRoll(vals);
@@ -150,5 +168,9 @@ public class Game {
             }
         }
         return won;
+    }
+
+    public boolean isSelected(int dieNum){
+        return dice.get(dieNum).isSelected();
     }
 }

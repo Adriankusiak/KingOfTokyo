@@ -221,7 +221,11 @@ public class GameBoard extends StackPane {
         boardInterface.updateDiceValues(integers);
     }
 
-    public void unselectAll() {
-        boardInterface.unselectAll();
+    public int getPort() {
+        return boardInterface.getPort();
+    }
+
+    public void updateSelected(ArrayList<Boolean> selected) {
+        boardInterface.updateSelected(selected);
     }
 }

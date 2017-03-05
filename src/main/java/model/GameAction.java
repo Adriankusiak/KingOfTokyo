@@ -7,6 +7,7 @@ public class GameAction implements Serializable{
     private String type;
     private ArrayList<Integer> deciData;
     private String stringData;
+    private boolean active = false;
 
     public GameAction(String type, ArrayList<Integer> deciData, String stringData){
         this.type = type;
@@ -24,5 +25,13 @@ public class GameAction implements Serializable{
 
     public String getStringData() {
         return stringData;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

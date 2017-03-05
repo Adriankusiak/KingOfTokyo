@@ -8,8 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Observable;
 
-public class Game {
+public class Game extends Observable{
     private ArrayList<Player> players;
     private ScriptEngine engine;
     private Deck deck;
@@ -26,8 +27,11 @@ public class Game {
     private int playerCount;
     private ArrayList<Die> dice;
     private boolean running;
+    private ArrayList<PowerCard> cardsInPlay;
 
     public Game(){
+        actionEngine = ActionEngine.getInstance();
+        cardsInPlay = new ArrayList<>();
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         try {
             engine.eval(new InputStreamReader(
@@ -42,23 +46,24 @@ public class Game {
             dice.add(new Die(3));
         }
         running = true;
-        Runtime.getRuntime().addShutdownHook(new Thread(()->running = false));
     }
 
-    public void joinGame(String ip){
+    public void joinGame(String ip, int port){
         hosting = false;
         try {
-            communicator = new Communicator(true, ip);
+            communicator = new Communicator(true, ip, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        actionEngine.resolve(this);
     }
 
 
     public void hostGame(int players){
         hosting = true;
+        actionEngine.resolve(this);
         try {
-            communicator = new Communicator(false, "");
+            communicator = new Communicator(false, "", 0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,16 +88,35 @@ public class Game {
 
     }
 
+
+    public void trySelect(int i){
+        ArrayList<Integer> data = new ArrayList<>();
+        data.add(i);
+        GameAction action = new GameAction("SELECT_DICE", data, null);
+        actionEngine.push(action);
+        inform(action);
+    }
+
+
+    public void tryUnselect(int i){
+        ArrayList<Integer> data = new ArrayList<>();
+        data.add(i);
+        GameAction action = new GameAction("UNSELECT_DICE", data, null);
+        actionEngine.push(action);
+        inform(action);
+
+    }
+
     public void selectDice(int i){
         dice.get(i).setSelected(true);
-        if(hosting) communicator.informAllSelect(i);
-        else communicator.informSelect(i);
+        this.setChanged();
+        this.notifyObservers();
     }
 
     public void unselectDice(int i){
         dice.get(i).setSelected(false);
-        if(hosting) communicator.informAllUnselect(i);
-        else communicator.informUnselect(i);
+        this.setChanged();
+        this.notifyObservers();
     }
 
     public ArrayList<Integer> rollSelected(){
@@ -110,7 +134,26 @@ public class Game {
         if(hosting) communicator.informAllRoll(vals);
         else communicator.informRoll(vals);
 
+        this.setChanged();
+        this.notifyObservers();
         return vals;
+    }
+
+    public void setDice(ArrayList<Integer> values){
+        for(int i = 0; i < values.size(); ++i){
+            Die d = dice.get(i);
+            d.setValue(values.get(i));
+            d.setSelected(false);
+
+        }
+        this.setChanged();
+        this.notifyObservers();
+    }
+
+    public void accept(){
+        GameAction action = new GameAction("RESOLVE", null, null);
+        actionEngine.push(action);
+        inform(action);
     }
 
     public void resolve(){
@@ -141,12 +184,16 @@ public class Game {
                     break;
             }
 
-            if(hosting) communicator.informAllResolve(vals);
-            else communicator.informResolve(vals);
             phase = 1;
         }
 
 
+    }
+
+    public void tryEndTurn(){
+        GameAction action = new GameAction("END_TURN", null, null);
+        actionEngine.push(action);
+        inform(action);
     }
 
     public void endTurn(){
@@ -172,11 +219,45 @@ public class Game {
         return won;
     }
 
+    public void inform(GameAction action){
+        if(hosting) communicator.informAll(action);
+        else communicator.inform(action);
+    }
+
     public boolean isSelected(int dieNum){
         return dice.get(dieNum).isSelected();
     }
 
     public boolean isRunning() {
         return running;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public ArrayList<Die> getDice() {
+        return dice;
+    }
+
+    public ArrayList<PowerCard> getCards() {
+        return cardsInPlay;
+    }
+
+    public void endRunning() {
+        running = false;
+        if(communicator!= null) communicator.endRunning();
+    }
+
+    public ArrayList<Integer> getDiceValues() {
+        ArrayList<Integer> values = new ArrayList<>();
+        for(Die d: dice) values.add(d.getValue());
+        return values;
+    }
+
+    public ArrayList<Boolean> getSelected() {
+        ArrayList<Boolean> values = new ArrayList<>();
+        for(Die d: dice) values.add(d.isSelected());
+        return values;
     }
 }

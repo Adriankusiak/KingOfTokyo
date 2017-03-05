@@ -7,24 +7,26 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Communicator{
     private boolean running;
     private InetAddress IPAddress;
     private int sendPortTCP = 9879;
-    private int listeningPortTCP = 9879;
     private ServerSocket hostSocket;
     private Socket clientSocket;
     private ActionEngine engineHandle;
     private ArrayList<Socket> clients;
+    private HashMap<Socket, ObjectOutputStream> streamMap;
 
-    public Communicator(Boolean client, String IP) throws IOException{
+    public Communicator(Boolean client, String IP, int port) throws IOException{
+        streamMap = new HashMap<>();
         engineHandle = ActionEngine.getInstance();
         clients = new ArrayList<>();
         running = true;
         if(client){
             IPAddress = InetAddress.getByName(IP);
-            clientSocket = new Socket(IPAddress, sendPortTCP);
+            clientSocket = new Socket(IPAddress, port);
             new Thread(() -> {
                 receiveEvents(clientSocket, false);
                 try {
@@ -33,17 +35,11 @@ public class Communicator{
                     e.printStackTrace();
                 }
             }).start();
-            Runtime.getRuntime().addShutdownHook(new Thread(()->running = false));
+
         }else{
-            hostSocket = new ServerSocket(listeningPortTCP);
+            hostSocket = new ServerSocket(0);
+            System.out.println("Server listening on " + hostSocket.getInetAddress() + ":" + hostSocket.getLocalPort());
             new Thread(()->receiveClients()).start();
-            Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){
-                try {
-                    hostSocket.close();
-                    System.out.println("The server is shut down!");
-                    running = false;
-                } catch (IOException e) { /* failed */ }
-            }});
         }
 
     }
@@ -56,8 +52,9 @@ public class Communicator{
                 new Thread(()->receiveEvents(newClient, true)).start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
+        System.out.println("Listening Closed");
     }
 
 
@@ -67,6 +64,7 @@ public class Communicator{
             objectInputStream = new ObjectInputStream(comSocket.getInputStream());
 
             while(running) {
+                System.out.println("Receiving events from client at "+ comSocket.getLocalAddress()+":"+comSocket.getLocalPort());
                 GameAction retrievedAction = (GameAction) objectInputStream.readObject();
                 if(share) informAllExcept(retrievedAction, comSocket);
                 engineHandle.push(retrievedAction);
@@ -94,8 +92,13 @@ public class Communicator{
         try {
 
             //System.out.println("Client connected");
-            ObjectOutputStream dos = new ObjectOutputStream(target.getOutputStream());
-            dos.writeObject(payload);
+            ObjectOutputStream oos = streamMap.get(target);
+            if(oos == null){
+                oos =new ObjectOutputStream(target.getOutputStream());
+                streamMap.put(target, oos);
+            }
+
+            oos.writeObject(payload);
 
             //System.out.println("Updateload received");
         } catch (IOException e) {
@@ -192,5 +195,21 @@ public class Communicator{
     }
 
 
+    public void informAll(GameAction action) {
+        for(Socket s : clients){
+            sendAction(action, s);
+        }
+    }
 
+    public void inform(GameAction action) {
+        sendAction(action, clientSocket);
+    }
+
+    public void endRunning() {
+        try {
+            if(hostSocket != null) hostSocket.close();
+            System.out.println("The server is shut down!");
+            running = false;
+        } catch (IOException e) { /* failed */ }
+    }
 }

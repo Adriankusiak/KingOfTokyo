@@ -1,18 +1,18 @@
 [
   {
-  "title": "test",
-  "cost": "1",
-  "description": "Test card",
-  "type": "keep",
-  "onDamage": "",
-  "onAttack": "",
-  "onRoll": "",
-  "onHealthGain": "",
-  "onPointGain": "",
-  "onEnergyGain": "",
-  "onMove": "",
-  "onTurnStart": "",
-  "onTurnEnd": ""
+    "title": "test",
+    "cost": "1",
+    "description": "Test card",
+    "type": "keep",
+    "onDamage": "",
+    "onAttack": "",
+    "onRoll": "",
+    "onHealthGain": "",
+    "onPointGain": "",
+    "onEnergyGain": "",
+    "onMove": "",
+    "onTurnEnd": "",
+    "onBuy": ""
   },
   {
     "title": "test2",
@@ -27,7 +27,8 @@
     "onEnergyGain": "",
     "onMove": "",
     "onTurnStart": "",
-    "onTurnEnd": ""
+    "onTurnEnd": "",
+    "onBuy": ""
   },
   {
     "title": "test5",
@@ -42,6 +43,7 @@
     "onEnergyGain": "",
     "onMove": "",
     "onTurnStart": "",
-    "onTurnEnd": ""
+    "onTurnEnd": "",
+    "onBuy": ""
   }
 ]

@@ -56,4 +56,7 @@ public class Die {
     }
 
 
+    public void setValue(Integer value) {
+        this.value = value;
+    }
 }

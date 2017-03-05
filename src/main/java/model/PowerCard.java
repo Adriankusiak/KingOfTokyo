@@ -69,5 +69,8 @@ public class PowerCard {
         scriptCard.callMember("onDamage");
     }
 
+    public void onBuy(ArrayList<Player> players, ArrayList<Die> dice, GameAction action, ActionEngine engine){
+        scriptCard.callMember("onBuy");
+    }
 
 }

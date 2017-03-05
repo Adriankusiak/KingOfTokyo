@@ -7,11 +7,14 @@ import javafx.scene.control.ToggleButton;
 import model.Game;
 import view.GameBoard;
 
+import java.util.Observable;
+import java.util.Observer;
+
 
 /**
  * Controller for the game
  */
-public class GameController {
+public class GameController implements Observer{
     /**
      * The view of the game
      */
@@ -30,6 +33,7 @@ public class GameController {
     public GameController(GameBoard gameBoard, Game game) {
         this.gameBoard = gameBoard;
         this.game = game;
+        game.addObserver(this);
         setActionListeners();
     }
 
@@ -43,23 +47,30 @@ public class GameController {
             if(value.equals("HOST")){
                 game.hostGame(gameBoard.getPlayerCount());
             }else{
-                game.joinGame(gameBoard.getIP());
+                game.joinGame(gameBoard.getIP(), gameBoard.getPort());
             }
 
             gameBoard.switchToGame();
         });
 
         gameBoard.setGameOptionHandler( event->{
-            gameBoard.updateDiceValues(game.rollSelected());
-            gameBoard.unselectAll();
+            game.rollSelected();
+
         });
 
         gameBoard.setDiceHandler(event->{
             ToggleButton dieButton = (ToggleButton)(event.getSource());
             int dieNum = Integer.parseInt(dieButton.getUserData().toString());
             if(game.isSelected(dieNum)){
-                game.unselectDice(dieNum);
-            }else game.selectDice(dieNum);
+                game.tryUnselect(dieNum);
+            }else game.trySelect(dieNum);
         });
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        gameBoard.updateDiceValues(game.getDiceValues());
+        gameBoard.updateSelected(game.getSelected());
+        System.out.println("updated");
     }
 }

@@ -28,7 +28,9 @@ public class BoardInterface extends VBox{
     private TextField playerField;
     private TextField energyField;
     private TextField addressField;
+    private TextField portField;
     private ArrayList<Button> choiceButtons;
+
 
     /**
      * Constructs new BoardInterface object, with it's state set to display player number interface.
@@ -113,6 +115,7 @@ public class BoardInterface extends VBox{
         playerField = new TextField("Enter Player Count");
         energyField = new TextField("Enter starting energy");
         addressField = new TextField("Enter IP Address");
+        portField = new TextField("Enter Port Number");
         Button hostGame = new Button("Host A Game");
         hostGame.setUserData("HOST");
         Button joinGame = new Button("Join A Game");
@@ -121,7 +124,7 @@ public class BoardInterface extends VBox{
         choiceButtons = new ArrayList<Button>();
         choiceButtons.add(hostGame);
         choiceButtons.add(joinGame);
-        playerChoice.getChildren().addAll(playerField, energyField, hostGame, addressField, joinGame);
+        playerChoice.getChildren().addAll(playerField, energyField, hostGame, addressField, portField, joinGame);
         playerChoice.setSpacing(20);
         playerChoice.setAlignment(Pos.CENTER);
 
@@ -147,9 +150,14 @@ public class BoardInterface extends VBox{
         }
     }
 
-    public void unselectAll() {
-        for(Node dieButton : dicePane.getChildren()){
-            ((ToggleButton) dieButton).setSelected(false);
+    public int getPort() {
+        return Integer.parseInt(portField.getText());
+    }
+
+    public void updateSelected(ArrayList<Boolean> selected) {
+        ObservableList<Node> children = dicePane.getChildren();
+        for(int i = 0; i < children.size(); ++i){
+            ((ToggleButton) children.get(i)).setSelected(selected.get(i));
         }
     }
 }

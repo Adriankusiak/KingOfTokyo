@@ -25,6 +25,7 @@ public class Game {
     private int phase;
     private int playerCount;
     private ArrayList<Die> dice;
+    private boolean running;
 
     public Game(){
         engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -40,7 +41,8 @@ public class Game {
         for(int i = 0; i < 8; ++i){
             dice.add(new Die(3));
         }
-
+        running = true;
+        Runtime.getRuntime().addShutdownHook(new Thread(()->running = false));
     }
 
     public void joinGame(String ip){
@@ -83,14 +85,14 @@ public class Game {
 
     public void selectDice(int i){
         dice.get(i).setSelected(true);
-        if(hosting) communicator.informAllSelect();
-        else communicator.informSelect();
+        if(hosting) communicator.informAllSelect(i);
+        else communicator.informSelect(i);
     }
 
     public void unselectDice(int i){
         dice.get(i).setSelected(false);
-        if(hosting) communicator.informAllUnselect();
-        else communicator.informUnselect();
+        if(hosting) communicator.informAllUnselect(i);
+        else communicator.informUnselect(i);
     }
 
     public ArrayList<Integer> rollSelected(){
@@ -112,7 +114,7 @@ public class Game {
     }
 
     public void resolve(){
-        int[] vals = new int[6];
+        Integer[] vals = new Integer[6];
 
         for(int i = 0; i < currentPlayer.getDiceCount(); ++i){
             Die d = dice.get(i);
@@ -172,5 +174,9 @@ public class Game {
 
     public boolean isSelected(int dieNum){
         return dice.get(dieNum).isSelected();
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

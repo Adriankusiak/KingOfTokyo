@@ -36,7 +36,7 @@ public class GameBoard extends StackPane {
      */
     public GameBoard(){
         boardInterface = new BoardInterface();
-        gameView = new Canvas(640,400);
+        gameView = new Canvas(960,640);
         graphicsContext = gameView.getGraphicsContext2D();
         turnLabel = new Label();
         labelPane = new HBox();

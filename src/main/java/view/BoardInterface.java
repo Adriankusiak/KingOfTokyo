@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.Node;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
  */
 public class BoardInterface extends VBox{
 
-    private FlowPane dicePane;
+    private GridPane dicePane;
     private VBox playerChoice;
     private HBox gameOptions;
     private TextField playerField;
@@ -30,6 +31,7 @@ public class BoardInterface extends VBox{
     private TextField addressField;
     private TextField portField;
     private ArrayList<Button> choiceButtons;
+    private ArrayList<ToggleButton> diceButtons;
 
 
     /**
@@ -45,8 +47,8 @@ public class BoardInterface extends VBox{
      * @param handler The handler to register.
      */
     public void setDiceHandler(EventHandler<ActionEvent> handler){
-        for(Node dieButton : dicePane.getChildren()){
-            ((ToggleButton) dieButton).setOnAction(handler);
+        for(ToggleButton dieButton : diceButtons){
+            dieButton.setOnAction(handler);
         }
     }
 
@@ -90,21 +92,22 @@ public class BoardInterface extends VBox{
 
     private void setupLayouts(){
         this.setSpacing(25);
-
-        dicePane = new FlowPane();
-        dicePane.setAlignment(Pos.CENTER);
-        dicePane.setVgap(125);
-        dicePane.setHgap(19);
-        dicePane.setPrefWrapLength(700);
-        dicePane.setPadding(new Insets(65,0,10,16));
+        diceButtons = new ArrayList<>();
+        dicePane = new GridPane();
+        dicePane.setGridLinesVisible(true);
+      //  dicePane.setAlignment(Pos.CENTER);
+       // dicePane.setVgap(125);
+       // dicePane.setHgap(19);
+       // dicePane.setPrefWrapLength(700);
+        dicePane.setPadding(new Insets(0,0,0,16));
         for(int i = 0; i < 6; ++i){
             ToggleButton newDieButton = new ToggleButton();
 
             newDieButton.setId("dieButton");
             newDieButton.setUserData(i);
             newDieButton.setText((i+1) + "");
-            dicePane.getChildren().add(newDieButton);
-
+            dicePane.add(newDieButton, (i%2), (int) Math.floor(i/2));
+            diceButtons.add(newDieButton);
         }
 
 
@@ -128,9 +131,9 @@ public class BoardInterface extends VBox{
         playerChoice.setSpacing(20);
         playerChoice.setAlignment(Pos.CENTER);
 
-        Button resetGame = new Button("ROLL");
-        resetGame.setUserData("ROLL");
-        gameOptions.getChildren().add(resetGame);
+        Button roll = new Button("ROLL");
+        roll.setUserData("ROLL");
+        gameOptions.getChildren().add(roll);
 
     }
 
@@ -143,10 +146,9 @@ public class BoardInterface extends VBox{
     }
 
     public void updateDiceValues(ArrayList<Integer> integers) {
-        ObservableList<Node> children = dicePane.getChildren();
-        for(int i = 0; i < children.size(); ++i){
-            Node dieButton = children.get(i);
-            ((ToggleButton) dieButton).setText(integers.get(i)+"");
+        for(int i = 0; i < diceButtons.size(); ++i){
+            ToggleButton dieButton = diceButtons.get(i);
+            dieButton.setText(integers.get(i)+"");
         }
     }
 
@@ -155,9 +157,8 @@ public class BoardInterface extends VBox{
     }
 
     public void updateSelected(ArrayList<Boolean> selected) {
-        ObservableList<Node> children = dicePane.getChildren();
-        for(int i = 0; i < children.size(); ++i){
-            ((ToggleButton) children.get(i)).setSelected(selected.get(i));
+        for(int i = 0; i < diceButtons.size(); ++i){
+            diceButtons.get(i).setSelected(selected.get(i));
         }
     }
 }

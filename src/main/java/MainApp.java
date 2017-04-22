@@ -26,6 +26,7 @@ public class MainApp extends Application
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest((e)-> game.endRunning());
         primaryStage.setResizable(false);
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 }

@@ -101,10 +101,9 @@ public class GameBoard extends StackPane {
      */
     public void switchToGame(){
         boardInterface.setGameInterface();
-        Sprite dieArea = new Sprite("resources/sprites/dieArea.png", 100, 180, 1);
-        dieArea.setPos(0, 50);
+        Sprite dieArea = new Sprite("dieArea.png", 703, 890, 1, 180, 250);
+        dieArea.setPos(0, 0);
         spriteList.add(dieArea);
-
     }
 
     /**

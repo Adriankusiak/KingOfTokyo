@@ -16,9 +16,11 @@ public class Sprite {
     protected double[] pos;
     protected int currentIndex;
     private double height, width;
-    private String basePath = "images/";
+    private String basePath = "/sprites/";
     private static HashMap<String, Image> loadedSheets = new HashMap<String, Image>();
     private static HashMap<String, ArrayList<Double>> loadedSheetIndexes = new HashMap<String, ArrayList<Double>>();
+    private double spriteHeight;
+    private double spriteWidth;
 
     /**
      * Constructs new Sprite object from spritesheet at path, using specified parameters to process it.
@@ -35,7 +37,27 @@ public class Sprite {
         this.width = width;
         this.frameCount = frameCount;
         loadSheet(path,frameCount);
+    }
 
+
+
+    /**
+     * Constructs new Sprite object from spritesheet at path, using specified parameters to process it.
+     * Default position is (0,0).
+     * @param path Path to spritesheet image.
+     * @param width Width of single sprite clip.
+     * @param height Height of single sprite clip.
+     * @param frameCount Number of frames of target sprite in given sheet image.
+     */
+    public Sprite(String path, int width, int height, int frameCount, int spriteWidth, int spriteHeight){
+        currentIndex = 0;
+        pos = new double[]{0,0};
+        this.height = height;
+        this.width = width;
+        this.frameCount = frameCount;
+        this.spriteWidth = spriteWidth;
+        this.spriteHeight = spriteHeight;
+        loadSheet(path,frameCount);
     }
 
 
@@ -62,7 +84,7 @@ public class Sprite {
      */
     public void draw(GraphicsContext g){
         g.drawImage(sheet,arrayOfIndexes.get(currentIndex).doubleValue(),
-                0.0, width, height, pos[0], pos[1], width, height);
+                0.0, width, height, pos[0], pos[1], spriteWidth, spriteHeight);
     }
 
     /**

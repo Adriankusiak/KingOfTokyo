@@ -37,6 +37,7 @@ public class GameController implements Observer{
         setActionListeners();
     }
 
+
     /**
      * Set the three action listeners received from the view
      */
@@ -71,6 +72,7 @@ public class GameController implements Observer{
     public void update(Observable o, Object arg) {
         gameBoard.updateDiceValues(game.getDiceValues());
         gameBoard.updateSelected(game.getSelected());
+        gameBoard.updatePlayers(game.getPlayers());
         System.out.println("updated");
     }
 }

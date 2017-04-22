@@ -15,8 +15,9 @@
         import javafx.scene.effect.DropShadow;
         import javafx.scene.paint.Paint;
         import javafx.scene.text.Font;
+        import model.Player;
 
-/**
+        /**
  * Animated interface class to represent an Oware game's state.
  */
 public class GameBoard extends StackPane {
@@ -100,6 +101,10 @@ public class GameBoard extends StackPane {
      */
     public void switchToGame(){
         boardInterface.setGameInterface();
+        Sprite dieArea = new Sprite("resources/sprites/dieArea.png", 100, 180, 1);
+        dieArea.setPos(0, 50);
+        spriteList.add(dieArea);
+
     }
 
     /**
@@ -227,5 +232,8 @@ public class GameBoard extends StackPane {
 
     public void updateSelected(ArrayList<Boolean> selected) {
         boardInterface.updateSelected(selected);
+    }
+
+    public void updatePlayers(ArrayList<Player> players) {
     }
 }

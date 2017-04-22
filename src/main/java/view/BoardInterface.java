@@ -10,6 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -32,18 +34,30 @@ public class BoardInterface extends VBox{
     private TextField portField;
     private ArrayList<Button> choiceButtons;
     private ArrayList<ToggleButton> diceButtons;
-
+    private ArrayList<Image> dice;
 
     /**
      * Constructs new BoardInterface object, with it's state set to display player number interface.
      */
     public BoardInterface(){
+        setupImages();
         setupLayouts();
         setPlayerChoice();
     }
 
+    private void setupImages() {
+        dice = new ArrayList<>();
+        int requestedSize = 67;
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/oneDice.png"), requestedSize, requestedSize, true, true));
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/twoDice.png"), requestedSize, requestedSize, true, true));
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/threeDice.png"), requestedSize, requestedSize, true, true));
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/attackDice.png"), requestedSize, requestedSize, true, true));
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/heartDice.png"), requestedSize, requestedSize, true, true));
+        dice.add(new Image(this.getClass().getResourceAsStream("/sprites/energyDice.png"), requestedSize, requestedSize, true, true));
+    }
+
     /**
-     * Registers an EventHandler for all house buttons.
+     * Registers an EventHandler for all die buttons.
      * @param handler The handler to register.
      */
     public void setDiceHandler(EventHandler<ActionEvent> handler){
@@ -97,15 +111,15 @@ public class BoardInterface extends VBox{
         dicePane.setGridLinesVisible(true);
       //  dicePane.setAlignment(Pos.CENTER);
        // dicePane.setVgap(125);
-       // dicePane.setHgap(19);
+        dicePane.setHgap(19);
        // dicePane.setPrefWrapLength(700);
-        dicePane.setPadding(new Insets(0,0,0,16));
+        dicePane.setPadding(new Insets(1,0,0,15));
         for(int i = 0; i < 6; ++i){
             ToggleButton newDieButton = new ToggleButton();
 
             newDieButton.setId("dieButton");
             newDieButton.setUserData(i);
-            newDieButton.setText((i+1) + "");
+            newDieButton.setGraphic(new ImageView(dice.get(0)));
             dicePane.add(newDieButton, (i%2), (int) Math.floor(i/2));
             diceButtons.add(newDieButton);
         }
@@ -131,8 +145,10 @@ public class BoardInterface extends VBox{
         playerChoice.setSpacing(20);
         playerChoice.setAlignment(Pos.CENTER);
 
-        Button roll = new Button("ROLL");
+        Button roll = new Button();
+        roll.setGraphic(new ImageView(new Image(this.getClass().getResourceAsStream("/sprites/rollButton.png"),180,80,true,true)));
         roll.setUserData("ROLL");
+        roll.setId("rollButton");
         gameOptions.getChildren().add(roll);
 
     }
@@ -148,7 +164,8 @@ public class BoardInterface extends VBox{
     public void updateDiceValues(ArrayList<Integer> integers) {
         for(int i = 0; i < diceButtons.size(); ++i){
             ToggleButton dieButton = diceButtons.get(i);
-            dieButton.setText(integers.get(i)+"");
+            int newValue = integers.get(i);
+            dieButton.setGraphic(new ImageView(dice.get(newValue)));
         }
     }
 

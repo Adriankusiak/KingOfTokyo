@@ -1,23 +1,34 @@
 #dieButton{
-    -fx-background-radius: 5em;
-    -fx-opacity: 0.6;
+    -fx-opacity: 0.9;
     -fx-min-width: 70px;
     -fx-min-height: 70px;
     -fx-max-width: 70px;
     -fx-max-height: 70px;
-    -fx-background-color: -fx-body-color;
+    -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-padding: 0px;
 }
 
 #dieButton:selected{
-    -fx-background-radius: 5em;
     -fx-min-width: 70px;
     -fx-min-height: 70px;
     -fx-max-width: 70px;
     -fx-max-height: 70px;
-    -fx-background-color: -fx-body-color;
+    -fx-background-color: transparent;
     -fx-background-insets: 0px;
     -fx-padding: 0px;
     -fx-body-color: crimson;
+    -fx-border-color: crimson; -fx-border-width:2;
+}
+
+#rollButton{
+    -fx-padding: 0px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px;
+}
+
+#rollButton:hover{
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-scale-z: 1.02;
 }

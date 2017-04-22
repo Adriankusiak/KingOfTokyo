@@ -20,7 +20,7 @@ public class Die {
 
     public int roll(){
         rolls -= 1;
-        value = generator.nextInt(6) + 1;
+        value = generator.nextInt(6);
         checkRollable();
         return value;
     }

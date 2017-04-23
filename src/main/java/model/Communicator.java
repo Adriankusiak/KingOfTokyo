@@ -12,15 +12,17 @@ import java.util.HashMap;
 public class Communicator{
     private boolean running;
     private InetAddress IPAddress;
-    private int sendPortTCP = 9879;
+    //private int sendPortTCP = 9879;
     private ServerSocket hostSocket;
     private Socket clientSocket;
     private ActionEngine engineHandle;
     private ArrayList<Socket> clients;
     private HashMap<Socket, ObjectOutputStream> streamMap;
+    private Game gameHandle;
 
-    public Communicator(Boolean client, String IP, int port) throws IOException{
+    public Communicator(Game game, Boolean client, String IP, int port) throws IOException{
         streamMap = new HashMap<>();
+        gameHandle = game;
         engineHandle = ActionEngine.getInstance();
         clients = new ArrayList<>();
         running = true;
@@ -34,7 +36,7 @@ public class Communicator{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }).start();
+            }){{setDaemon(true);}}.start();
 
         }else{
             hostSocket = new ServerSocket(0);
@@ -44,11 +46,25 @@ public class Communicator{
 
     }
 
+    private void receiveHandshake(ObjectInputStream objectInputStream) {
+
+        try {
+            GameAction retrievedAction = (GameAction) objectInputStream.readObject();
+            gameHandle.initialiseJoin(retrievedAction.getDeciData(), retrievedAction.getStringData());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void receiveClients() {
         try {
             while (running) {
                 Socket newClient = hostSocket.accept();
                 clients.add(newClient);
+                sendAction(gameHandle.newPlayerAction(), newClient);
                 new Thread(()->receiveEvents(newClient, true)).start();
             }
         } catch (IOException e) {
@@ -62,7 +78,7 @@ public class Communicator{
         ObjectInputStream objectInputStream = null;
         try {
             objectInputStream = new ObjectInputStream(comSocket.getInputStream());
-
+            if(clientSocket != null) receiveHandshake(objectInputStream);
             while(running) {
                 System.out.println("Receiving events from client at "+ comSocket.getLocalAddress()+":"+comSocket.getLocalPort());
                 GameAction retrievedAction = (GameAction) objectInputStream.readObject();

@@ -14,12 +14,10 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.Node;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 /**
@@ -55,7 +53,7 @@ public class BoardInterface extends VBox{
 
     private void setupImages() {
         dice = new ArrayList<>();
-        int requestedSize = 67;
+        int requestedSize = 66;
         dice.add(new Image(this.getClass().getResourceAsStream("/sprites/oneDice.png"), requestedSize, requestedSize, true, true));
         dice.add(new Image(this.getClass().getResourceAsStream("/sprites/twoDice.png"), requestedSize, requestedSize, true, true));
         dice.add(new Image(this.getClass().getResourceAsStream("/sprites/threeDice.png"), requestedSize, requestedSize, true, true));
@@ -113,15 +111,12 @@ public class BoardInterface extends VBox{
     }
 
     private void setupLayouts(){
-        this.setSpacing(25);
         diceButtons = new ArrayList<>();
         dicePane = new GridPane();
-        dicePane.setGridLinesVisible(true);
-      //  dicePane.setAlignment(Pos.CENTER);
-       // dicePane.setVgap(125);
+      //  dicePane.setGridLinesVisible(true);
         dicePane.setHgap(19);
-       // dicePane.setPrefWrapLength(700);
-        dicePane.setPadding(new Insets(1,0,0,15));
+        dicePane.setVgap(1);
+        dicePane.setPadding(new Insets(1,0,0,14));
         for(int i = 0; i < 6; ++i){
             ToggleButton newDieButton = new ToggleButton();
 
@@ -223,6 +218,7 @@ public class BoardInterface extends VBox{
         roll.setGraphic(new ImageView(new Image(this.getClass().getResourceAsStream("/sprites/rollButton.png"),180,80,true,true)));
         roll.setUserData("ROLL");
         roll.setId("rollButton");
+        gameOptions.setPadding(new Insets(5,0,0,0));
         gameOptions.getChildren().add(roll);
 
     }
@@ -271,5 +267,32 @@ public class BoardInterface extends VBox{
         for(int i = 0; i < diceButtons.size(); ++i){
             diceButtons.get(i).setSelected(selected.get(i));
         }
+    }
+
+    public int getStartingEnergy() {
+        return Integer.parseInt(energyField.getText());
+    }
+
+    public int getMaxPoints() {
+        if(pointField.getText().length()==0) return -1;
+        return Integer.parseInt(pointField.getText());
+    }
+
+    public String getPlayerName() {
+        return nameField.getText();
+    }
+
+    public String getPlayerChar() {
+        return "Nobody";
+    }
+
+    public int getStartingLife() {
+        if(healthField.getText().length()==0) return -1;
+        return Integer.parseInt(healthField.getText());
+    }
+
+    public int getMaxLife() {
+        if(maxHealthField.getText().length()==0) return -1;
+        return Integer.parseInt(maxHealthField.getText());
     }
 }

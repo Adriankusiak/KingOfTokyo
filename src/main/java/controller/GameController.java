@@ -1,7 +1,5 @@
 package controller;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import model.Game;
@@ -46,9 +44,10 @@ public class GameController implements Observer{
             String value = ((Button) event.getSource()).getUserData().toString();
             System.out.println(value);
             if(value.equals("HOST")){
-                game.hostGame(gameBoard.getPlayerCount());
+                game.hostGame(gameBoard.getPlayerName(), gameBoard.getPlayerChar(), gameBoard.getPlayerCount(), gameBoard.getMaxPoints(),
+                        gameBoard.getStartingEnergy(), gameBoard.getStartingLife(), gameBoard.getMaxLife());
             }else{
-                game.joinGame(gameBoard.getIP(), gameBoard.getPort());
+                game.joinGame(gameBoard.getIP(), gameBoard.getPort(), gameBoard.getPlayerName(), gameBoard.getPlayerChar());
             }
 
             gameBoard.switchToGame();
@@ -65,6 +64,7 @@ public class GameController implements Observer{
             if(game.isSelected(dieNum)){
                 game.tryUnselect(dieNum);
             }else game.trySelect(dieNum);
+            gameBoard.updateSelected(game.getSelected());
         });
     }
 

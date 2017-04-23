@@ -6,9 +6,10 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Observable;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game extends Observable{
     private ArrayList<Player> players;
@@ -28,6 +29,9 @@ public class Game extends Observable{
     private ArrayList<Die> dice;
     private boolean running;
     private ArrayList<PowerCard> cardsInPlay;
+    private int startingEnergy;
+    private int startingLife;
+    private int maxLife;
 
     public Game(){
         actionEngine = ActionEngine.getInstance();
@@ -46,50 +50,68 @@ public class Game extends Observable{
             dice.add(new Die(3));
         }
         running = true;
+        phase = -2;
     }
 
-    public void joinGame(String ip, int port){
+    public void joinGame(String ip, int port, String playerName, String playerCharacter){
         hosting = false;
         try {
-            communicator = new Communicator(true, ip, port);
+            communicator = new Communicator(this, true, ip, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
         actionEngine.resolve(this);
+        GameAction joinAction = new GameAction("JOIN",null, playerName+":"+playerCharacter);
+        inform(joinAction);
+        actionEngine.push(joinAction);
+
     }
 
+    public void initialiseJoin(ArrayList<Integer> deciData, String stringData) {
+        newGame(deciData.get(0), deciData.get(1), deciData.get(2), deciData.get(3),
+                deciData.get(4), deciData.get(5), deciData.get(6));
 
-    public void hostGame(int players){
+        String[] splitData = stringData.split(":");
+
+        for(String s : splitData){
+            String[] innerSplit = s.split(",");
+            addPlayer(innerSplit[0], innerSplit[1]);
+        }
+    }
+    public void hostGame(String playerName, String playerCharacter, int players, int maxPoints, int startingEnergy, int startingLife, int maxLife){
         hosting = true;
         actionEngine.resolve(this);
         try {
-            communicator = new Communicator(false, "", 0);
+            communicator = new Communicator(this, false, "", 0);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        newGame(4, 3, 0, 0,
-               new ArrayList<String>(Arrays.asList("Adrian", "Córdoba", "La Plata")),
-               new ArrayList<String>(Arrays.asList("Grizzly", "Cthullu", "blash")),
-                0, 10, 12);
+        newGame(maxPoints, players, 0, ThreadLocalRandom.current().nextInt(0, players),
+                startingEnergy, startingLife, maxLife);
+        addPlayer(playerName, playerCharacter);
     }
 
-    public void newGame(int maxPoints, int playerCount, int localPlayer, int startingPlayer, ArrayList<String> names, ArrayList<String> characters, int startingEnergy, int startingLife, int maxLife){
-        players = new ArrayList<>();
-        for(int i = 0; i < playerCount; ++i){
-            players.add(new Player(names.get(i),  characters.get(i), startingEnergy, startingLife, maxLife));
-        }
+    public void newGame(int maxPoints, int playerCount, int localPlayer, int startingPlayer, int startingEnergy, int startingLife, int maxLife){
+        this.startingEnergy = startingEnergy;
+        this.startingLife = startingLife;
+        this.maxLife = maxLife;
+        this.players = new ArrayList<>();
         this.playerCount = playerCount;
-        pointsToWin = maxPoints;
-        currentIndex = startingPlayer;
-        currentPlayer = players.get(startingPlayer);
-        localPlayerIndex = localPlayer;
-        won = false;
-
+        this.pointsToWin = maxPoints;
+        this.currentIndex = startingPlayer;
+        this.localPlayerIndex = localPlayer;
+        this.won = false;
     }
 
+    public void addPlayer(String name, String character){
+        players.add(new Player(name,  character, startingEnergy, startingLife, maxLife));
+        this.setChanged();
+        this.notifyObservers();
+    }
 
     public void trySelect(int i){
+        if(!playerTurn()) return;
         ArrayList<Integer> data = new ArrayList<>();
         data.add(i);
         GameAction action = new GameAction("SELECT_DICE", data, null);
@@ -99,6 +121,7 @@ public class Game extends Observable{
 
 
     public void tryUnselect(int i){
+        if(!playerTurn()) return;
         ArrayList<Integer> data = new ArrayList<>();
         data.add(i);
         GameAction action = new GameAction("UNSELECT_DICE", data, null);
@@ -259,5 +282,30 @@ public class Game extends Observable{
         ArrayList<Boolean> values = new ArrayList<>();
         for(Die d: dice) values.add(d.isSelected());
         return values;
+    }
+
+
+    public GameAction newPlayerAction() {
+        ArrayList<Integer> gameData = new ArrayList<>();
+        gameData.add(pointsToWin);
+        gameData.add(playerCount);
+        gameData.add(players.size());
+        gameData.add(currentIndex);
+        gameData.add(startingEnergy);
+        gameData.add(startingLife);
+        gameData.add(maxLife);
+        String playerData = "";
+        for(Player p : players){
+            playerData += p.getName()+","+p.getCharacter() + ":";
+        }
+        return new GameAction("INITIALIZE", gameData, playerData);
+    }
+
+    public void checkStart() {
+        if(players.size() == playerCount && phase == -2) {
+            phase = 0;
+            currentPlayer = players.get(currentIndex);
+            System.out.println("Started");
+        }
     }
 }

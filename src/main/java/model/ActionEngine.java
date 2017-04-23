@@ -84,6 +84,11 @@ public class ActionEngine {
             case "BUY":
                 for(PowerCard c : cards) c.onBuy(game.getPlayers(), game.getDice(), action, this);
                 break;
+            case "JOIN":
+                String[] playerInfo = action.getStringData().split(":");
+                game.addPlayer(playerInfo[0], playerInfo[1]);
+                game.checkStart();
+                break;
             default:
                 break;
         }

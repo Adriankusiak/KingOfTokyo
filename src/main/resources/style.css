@@ -4,7 +4,6 @@
 }
 #dieButton{
     -fx-cursor: hand;
-    -fx-opacity: 0.9;
     -fx-min-width: 70px;
     -fx-min-height: 70px;
     -fx-max-width: 70px;

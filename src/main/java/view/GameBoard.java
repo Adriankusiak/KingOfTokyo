@@ -234,4 +234,28 @@ public class GameBoard extends StackPane {
 
     public void updatePlayers(ArrayList<Player> players) {
     }
+
+    public String getPlayerName() {
+        return boardInterface.getPlayerName();
+    }
+
+    public String getPlayerChar() {
+        return boardInterface.getPlayerChar();
+    }
+
+    public int getStartingLife() {
+        return boardInterface.getStartingLife();
+    }
+
+    public int getMaxLife() {
+        return boardInterface.getMaxLife();
+    }
+
+    public int getMaxPoints() {
+        return boardInterface.getMaxPoints();
+    }
+
+    public int getStartingEnergy() {
+        return boardInterface.getStartingEnergy();
+    }
 }

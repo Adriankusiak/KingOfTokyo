@@ -144,6 +144,16 @@ public class Game extends Observable{
 
     public ArrayList<Integer> rollSelected(){
         ArrayList<Integer> vals = new ArrayList<>();
+        boolean selectedRollable = false;
+        for(int i = 0; i< currentPlayer.getDiceCount(); ++i){
+            Die d = dice.get(i);
+            if(d.isSelected() && d.isRollable()){
+                selectedRollable = true;
+            }
+            vals.add(d.getValue());
+        }
+        if(!selectedRollable) return vals;
+        vals = new ArrayList<>();
         for(int i = 0; i < currentPlayer.getDiceCount(); ++i){
             Die d = dice.get(i);
             if(d.isSelected() && d.isRollable()) vals.add(d.roll());

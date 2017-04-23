@@ -1,3 +1,7 @@
+.text-field.error {
+    -fx-text-box-border: red ;
+    -fx-focus-color: red ;
+}
 #dieButton{
     -fx-cursor: hand;
     -fx-opacity: 0.9;

@@ -1,6 +1,8 @@
 package view;
 
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -30,11 +32,17 @@ public class BoardInterface extends VBox{
     private HBox gameOptions;
     private TextField playerField;
     private TextField energyField;
+    private TextField pointField;
+    private TextField healthField;
+    private TextField maxHealthField;
     private TextField addressField;
     private TextField portField;
     private ArrayList<Button> choiceButtons;
     private ArrayList<ToggleButton> diceButtons;
     private ArrayList<Image> dice;
+    private Button joinGame;
+    private Button hostGame;
+    private TextField nameField;
 
     /**
      * Constructs new BoardInterface object, with it's state set to display player number interface.
@@ -128,20 +136,86 @@ public class BoardInterface extends VBox{
         playerChoice = new VBox();
         gameOptions = new HBox();
 
-
-        playerField = new TextField("Enter Player Count");
-        energyField = new TextField("Enter starting energy");
-        addressField = new TextField("Enter IP Address");
-        portField = new TextField("Enter Port Number");
-        Button hostGame = new Button("Host A Game");
+        nameField = new TextField();
+        playerField = new TextField();
+        energyField = new TextField();
+        pointField = new TextField();
+        healthField = new TextField();
+        maxHealthField = new TextField();
+        addressField = new TextField();
+        portField = new TextField();
+        hostGame = new Button("Host A Game");
         hostGame.setUserData("HOST");
-        Button joinGame = new Button("Join A Game");
+        hostGame.disableProperty().setValue(true);
+        joinGame = new Button("Join A Game");
         joinGame.setUserData("JOIN");
+        joinGame.disableProperty().setValue(true);
 
-        choiceButtons = new ArrayList<Button>();
+        nameField.setPromptText("Enter player name");
+        playerField.setPromptText("Enter player Count");
+        energyField.setPromptText("Enter starting energy");
+        pointField.setPromptText("Enter victory point goal");
+        healthField.setPromptText("Enter starting health");
+        maxHealthField.setPromptText("Enter max health");
+        addressField.setPromptText("Enter IP Address");
+        portField.setPromptText("Enter Port Number");
+
+        // force the fields to be numeric only
+        playerField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                playerField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            String currText = playerField.getText();
+            if(currText.length() != 0){
+                int val = Integer.parseInt(currText.substring(currText.length()-1));
+                if(val > 4)  playerField.setText("4");
+                else if(val < 2)  playerField.setText("2");
+                else playerField.setText(val+"");
+            }
+            checkHostFields();
+        });
+
+        energyField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                energyField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            checkHostFields();
+        });
+
+        pointField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                pointField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        healthField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                healthField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        maxHealthField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                maxHealthField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        addressField.textProperty().addListener((observable, oldValue, newValue) -> {
+            addressField.setText(newValue.replaceAll("[^\\d\\.]", ""));
+
+            checkJoinFields();
+        });
+
+        portField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                portField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            checkJoinFields();
+        });
+        choiceButtons = new ArrayList<>();
         choiceButtons.add(hostGame);
         choiceButtons.add(joinGame);
-        playerChoice.getChildren().addAll(playerField, energyField, hostGame, addressField, portField, joinGame);
+        playerChoice.getChildren().addAll(nameField, playerField, energyField, pointField, healthField, maxHealthField, hostGame, addressField, portField, joinGame);
         playerChoice.setSpacing(20);
         playerChoice.setAlignment(Pos.CENTER);
 
@@ -152,6 +226,26 @@ public class BoardInterface extends VBox{
         gameOptions.getChildren().add(roll);
 
     }
+
+    private void checkJoinFields() {
+        String IPV4_PATTERN = "^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$";
+        boolean addressProper = true;
+        if(!addressField.getText().matches(IPV4_PATTERN)){
+            addressProper = false;
+            if(!addressField.getStyleClass().contains("error"))addressField.getStyleClass().add("error");
+        }else{
+            if(addressField.getStyleClass().contains("error"))addressField.getStyleClass().remove("error");
+        }
+
+        if(portField.getText().length()==0 || addressField.getText().length()==0 || !addressProper) joinGame.disableProperty().setValue(true);
+        else joinGame.disableProperty().setValue(false);
+    }
+
+    private void checkHostFields() {
+        if(playerField.getText().length()==0 || energyField.getText().length()==0) hostGame.disableProperty().setValue(true);
+        else hostGame.disableProperty().setValue(false);
+    }
+
 
     public String getIP() {
         return addressField.getText();

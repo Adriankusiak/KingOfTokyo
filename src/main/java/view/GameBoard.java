@@ -1,24 +1,23 @@
+package view;
 
-        package view;
+import java.util.ArrayList;
 
-        import java.util.ArrayList;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import model.Player;
 
-        import javafx.application.Platform;
-        import javafx.event.ActionEvent;
-        import javafx.event.EventHandler;
-        import javafx.geometry.Pos;
-        import javafx.scene.canvas.Canvas;
-        import javafx.scene.canvas.GraphicsContext;
-        import javafx.scene.layout.StackPane;
-        import javafx.scene.layout.HBox;
-        import javafx.scene.control.Label;
-        import javafx.scene.effect.DropShadow;
-        import javafx.scene.paint.Paint;
-        import javafx.scene.text.Font;
-        import model.Player;
-
-        /**
- * Animated interface class to represent an Oware game's state.
+/**
+ * Animated interface class to represent game's state.
  */
 public class GameBoard extends StackPane {
     private Canvas gameView;

@@ -28,6 +28,7 @@ public class GameBoard extends StackPane {
     private Label turnLabel;
     private HBox labelPane;
     private Label winnerLabel;
+    private ArrayList<PlayerCard> playerCards;
 
     /**
      * Constructs new GameBoard object with initial option to choose player count,
@@ -97,12 +98,26 @@ public class GameBoard extends StackPane {
 
     /**
      * Switched interface to main game buttons so the game interaction can begin.
+     * @param playerCount
      */
-    public void switchToGame(){
+    public void switchToGame(int playerCount){
         boardInterface.setGameInterface();
         Sprite dieArea = new Sprite("dieArea.png", 703, 890, 1, 180, 250);
         dieArea.setPos(0, 0);
         spriteList.add(dieArea);
+        if(playerCards == null){
+            playerCards = new ArrayList<>();
+            double cardSpace = (960-playerCount*180)/(playerCount+1);
+            for(int i = 0; i < playerCount; ++i){
+                PlayerCard card = new PlayerCard();
+                card.setPos(cardSpace+(180+cardSpace)*i, 390);
+                playerCards.add(card);
+            }
+        }
+        for(int i = 0; i < playerCount; ++i){
+            spriteList.add(playerCards.get(i));
+        }
+
     }
 
     /**

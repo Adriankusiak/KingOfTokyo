@@ -308,4 +308,8 @@ public class Game extends Observable{
             System.out.println("Started");
         }
     }
+
+    public int playerCount() {
+        return playerCount;
+    }
 }

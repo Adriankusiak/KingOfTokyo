@@ -19,8 +19,8 @@ public class Sprite {
     private String basePath = "/sprites/";
     private static HashMap<String, Image> loadedSheets = new HashMap<String, Image>();
     private static HashMap<String, ArrayList<Double>> loadedSheetIndexes = new HashMap<String, ArrayList<Double>>();
-    private double spriteHeight;
-    private double spriteWidth;
+    protected double spriteHeight;
+    protected double spriteWidth;
 
     /**
      * Constructs new Sprite object from spritesheet at path, using specified parameters to process it.

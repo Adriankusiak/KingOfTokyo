@@ -50,7 +50,7 @@ public class GameController implements Observer{
                 game.joinGame(gameBoard.getIP(), gameBoard.getPort(), gameBoard.getPlayerName(), gameBoard.getPlayerChar());
             }
 
-            gameBoard.switchToGame();
+            gameBoard.switchToGame(game.playerCount());
         });
 
         gameBoard.setGameOptionHandler( event->{

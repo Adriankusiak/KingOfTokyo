@@ -44,10 +44,10 @@ public class GameController implements Observer{
             String value = ((Button) event.getSource()).getUserData().toString();
             System.out.println(value);
             if(value.equals("HOST")){
-                game.hostGame(gameBoard.getPlayerName(), gameBoard.getPlayerChar(), gameBoard.getPlayerCount(), gameBoard.getMaxPoints(),
+                game.hostGame(gameBoard.getPlayerName(), gameBoard.getPlayerCount(), gameBoard.getMaxPoints(),
                         gameBoard.getStartingEnergy(), gameBoard.getStartingLife(), gameBoard.getMaxLife());
             }else{
-                game.joinGame(gameBoard.getIP(), gameBoard.getPort(), gameBoard.getPlayerName(), gameBoard.getPlayerChar());
+                game.joinGame(gameBoard.getIP(), gameBoard.getPort(), gameBoard.getPlayerName());
             }
 
             gameBoard.switchToGame(game.playerCount());

@@ -20,6 +20,7 @@ import model.Player;
  * Animated interface class to represent game's state.
  */
 public class GameBoard extends StackPane {
+    private double[] mousePos;
     private Canvas gameView;
     private GraphicsContext graphicsContext;
     private BoardInterface boardInterface;
@@ -37,6 +38,11 @@ public class GameBoard extends StackPane {
     public GameBoard(){
         boardInterface = new BoardInterface();
         gameView = new Canvas(960,640);
+        mousePos = new double[2];
+        boardInterface.setOnMouseMoved((arg)->{
+             mousePos[0] = arg.getSceneX();
+             mousePos[1] = arg.getSceneY();
+        });
         graphicsContext = gameView.getGraphicsContext2D();
         turnLabel = new Label();
         labelPane = new HBox();
@@ -109,7 +115,7 @@ public class GameBoard extends StackPane {
             playerCards = new ArrayList<>();
             double cardSpace = (960-playerCount*180)/(playerCount+1);
             for(int i = 0; i < playerCount; ++i){
-                PlayerCard card = new PlayerCard();
+                PlayerCard card = new PlayerCard(this);
                 card.setPos(cardSpace+(180+cardSpace)*i, 390);
                 playerCards.add(card);
             }
@@ -200,6 +206,7 @@ public class GameBoard extends StackPane {
     }
 
     private void draw(){
+        graphicsContext.clearRect(0, 0, gameView.getWidth(), gameView.getHeight());
         for(Sprite s : spriteList){
             s.draw(graphicsContext);
 
@@ -272,5 +279,9 @@ public class GameBoard extends StackPane {
 
     public int getStartingEnergy() {
         return boardInterface.getStartingEnergy();
+    }
+
+    public double[] getMousePos(){
+        return mousePos;
     }
 }

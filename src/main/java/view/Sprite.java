@@ -15,7 +15,7 @@ public class Sprite {
     protected int frameCount;
     protected double[] pos;
     protected int currentIndex;
-    private double height, width;
+    protected double height, width;
     private String basePath = "/sprites/";
     private static HashMap<String, Image> loadedSheets = new HashMap<String, Image>();
     private static HashMap<String, ArrayList<Double>> loadedSheetIndexes = new HashMap<String, ArrayList<Double>>();

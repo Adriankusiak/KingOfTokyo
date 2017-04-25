@@ -224,6 +224,12 @@ public class Communicator{
     public void endRunning() {
         try {
             if(hostSocket != null) hostSocket.close();
+            for(Socket c : clients){
+                try{
+                    c.close();
+                }catch (IOException e){}
+
+            }
             System.out.println("The server is shut down!");
             running = false;
         } catch (IOException e) { /* failed */ }

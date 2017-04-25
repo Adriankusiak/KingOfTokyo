@@ -1,6 +1,9 @@
 package view;
 
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.PerspectiveTransform;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -9,15 +12,83 @@ public class PlayerCard extends Sprite{
     private boolean initialized;
     private int health;
     private int energy;
+    private Canvas transfCanvas;
+    private GraphicsContext transContext;
+    private double[][] transforms;
+    private static double[][] originals = new double[][]{{0,0},
+        {180.0,0.0},
+        {180.0,250.0},
+        {0.0,250}};
 
-    public PlayerCard() {
+    private double transSpeed;
+    GameBoard boardHandle;
+    private double[][] transformLeftTop;
+    private double[][] transformLeftBottom;
+    private double[][] transformRightBottom;
+    private double[][] transformRightTop;
+
+    public PlayerCard(GameBoard board) {
         super("playerCard.png", 897, 1218, 1, 180, 250);
+        boardHandle = board;
         initialized = false;
+        transfCanvas = new Canvas(180,250);
+        transContext = transfCanvas.getGraphicsContext2D();
+        setupTransforms();
+        transSpeed = 30;
+    }
+
+    private void setupTransforms() {
+        transforms = new double[][]{
+                {0,0},
+                {180.0,0.0},
+                {180.0,250.0},
+                {0.0,250}};
+        transformLeftTop = new double[][]{
+                {5,5},
+                {180.0,0.0},
+                {180.0,250.0},
+                {0.0,250.0}};
+
+        transformRightTop = new double[][]{
+                {0,0},
+                {175.0,5.0},
+                {180.0,250.0},
+                {0.0,250}};
+
+        transformLeftBottom = new double[][]{
+                {0,0},
+                {180.0,0.0},
+                {180.0,250.0},
+                {5.0,245}};
+        transformRightBottom = new double[][]{
+                {0,0},
+                {180.0,0.0},
+                {175.0,245.0},
+                {0.0,250}};
     }
 
     @Override
     public void draw(GraphicsContext g){
-        super.draw(g);
+        transfCanvas = new Canvas(180,250);
+        transContext = transfCanvas.getGraphicsContext2D();
+        PerspectiveTransform perspectiveTrasform = new PerspectiveTransform();
+        perspectiveTrasform.setUlx(transforms[0][0]);
+        perspectiveTrasform.setUly(transforms[0][1]);
+        perspectiveTrasform.setUrx(transforms[1][0]);
+        perspectiveTrasform.setUry(transforms[1][1]);
+        perspectiveTrasform.setLrx(transforms[2][0]);
+        perspectiveTrasform.setLry(transforms[2][1]);
+        perspectiveTrasform.setLlx(transforms[3][0]);
+        perspectiveTrasform.setLly(transforms[3][1]);
+        transfCanvas.setEffect(perspectiveTrasform);
+        transfCanvas.setCache(false);
+        transContext.drawImage(sheet,arrayOfIndexes.get(currentIndex).doubleValue(),
+                0.0, width, height, 0, 0, spriteWidth, spriteHeight);
+
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+
+        g.drawImage(transfCanvas.snapshot(params, null), pos[0], pos[1]);
         if(initialized){
             g.setFill(Color.LIGHTGREEN);
             g.fillText(health+"", pos[0]+spriteWidth*0.36,pos[1]+spriteHeight*0.97);
@@ -39,5 +110,39 @@ public class PlayerCard extends Sprite{
         energy = newEnergy;
     }
 
+    @Override
+    public void update(double delta){
+        super.update(delta);
+        double[] mousePos = boardHandle.getMousePos();
+        if(mousePos[0] < pos[0] || mousePos[0] > pos[0] + spriteWidth || mousePos[1] < pos[1]){
+            applyTransform(delta/1000000000, originals);
+        }
+        else calculatePerspectives(mousePos, delta/1000000000);
+    }
+
+    private void calculatePerspectives(double[] mousePos, double deltaFactor) {
+        if(mousePos[0]< pos[0]+spriteWidth/2){
+            if(mousePos[1] < pos[1]+spriteHeight/2) applyTransform(deltaFactor, transformLeftTop);
+            else applyTransform(deltaFactor, transformLeftBottom);
+        }else{
+            if(mousePos[1] < pos[1]+spriteHeight/2) applyTransform(deltaFactor, transformRightTop);
+            else applyTransform(deltaFactor, transformRightBottom);
+        }
+
+    }
+
+    private void applyTransform(double deltaFactor, double[][] transformMatrix) {
+        for(int i = 0; i < transforms.length; ++i){
+            for(int j = 0; j < transforms[i].length; ++j){
+                if(transforms[i][j] > transformMatrix[i][j]){
+                    transforms[i][j] -= deltaFactor*transSpeed;
+                    if(transforms[i][j] < transformMatrix[i][j]) transforms[i][j] = transformMatrix[i][j];
+                }else if(transforms[i][j] < transformMatrix[i][j]){
+                    transforms[i][j] += deltaFactor*transSpeed;
+                    if(transforms[i][j] > transformMatrix[i][j]) transforms[i][j] = transformMatrix[i][j];
+                }
+            }
+        }
+    }
 
 }

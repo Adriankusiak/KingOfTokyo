@@ -26,15 +26,18 @@ public class PlayerCard extends Sprite{
     private double[][] transformLeftBottom;
     private double[][] transformRightBottom;
     private double[][] transformRightTop;
+    private double currentIndexFractional;
 
     public PlayerCard(GameBoard board) {
-        super("playerCard.png", 897, 1218, 1, 180, 250);
+        super("playerCard.png", 180, 250, 96, 180, 250);
         boardHandle = board;
         initialized = false;
         transfCanvas = new Canvas(180,250);
         transContext = transfCanvas.getGraphicsContext2D();
         setupTransforms();
         transSpeed = 30;
+        currentAnim = 0;
+        animOffsets = new int[]{0,50};
     }
 
     private void setupTransforms() {
@@ -82,7 +85,7 @@ public class PlayerCard extends Sprite{
         perspectiveTrasform.setLly(transforms[3][1]);
         transfCanvas.setEffect(perspectiveTrasform);
         transfCanvas.setCache(false);
-        transContext.drawImage(sheet,arrayOfIndexes.get(currentIndex).doubleValue(),
+        transContext.drawImage(spriteFrames.get(currentIndex), 0.0,
                 0.0, width, height, 0, 0, spriteWidth, spriteHeight);
 
         SnapshotParameters params = new SnapshotParameters();
@@ -112,12 +115,21 @@ public class PlayerCard extends Sprite{
 
     @Override
     public void update(double delta){
-        super.update(delta);
+        int FPS = 20;
+        double deltaFactor = delta/1000000000;
         double[] mousePos = boardHandle.getMousePos();
         if(mousePos[0] < pos[0] || mousePos[0] > pos[0] + spriteWidth || mousePos[1] < pos[1]){
-            applyTransform(delta/1000000000, originals);
+            applyTransform(deltaFactor, originals);
         }
-        else calculatePerspectives(mousePos, delta/1000000000);
+        else calculatePerspectives(mousePos, deltaFactor);
+        currentIndexFractional += delta/(1000000000/FPS);
+        if(currentIndexFractional >= currentIndex+1) {
+            nextFrame();
+            if(currentIndex == animOffsets[currentAnim]) currentIndexFractional = animOffsets[currentAnim];
+            if(currentAnim == 0 && currentIndex == animOffsets[currentAnim+1]-1){
+                currentAnim =1;
+            }
+        }
     }
 
     private void calculatePerspectives(double[] mousePos, double deltaFactor) {

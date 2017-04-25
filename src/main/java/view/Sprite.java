@@ -5,20 +5,23 @@ import java.util.HashMap;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 
 /**
  * Utility Image wrapper for loading sprite from a spritesheet and handle updating/drawing
  */
 public class Sprite {
     protected ArrayList<Double> arrayOfIndexes;
-    protected Image sheet;
+    protected ArrayList<Image> spriteFrames;
     protected int frameCount;
     protected double[] pos;
+    protected int[] animOffsets;
+    protected int currentAnim;
     protected int currentIndex;
-    protected double height, width;
+    protected int height, width;
     private String basePath = "/sprites/";
-    private static HashMap<String, Image> loadedSheets = new HashMap<String, Image>();
-    private static HashMap<String, ArrayList<Double>> loadedSheetIndexes = new HashMap<String, ArrayList<Double>>();
+    private static HashMap<String, ArrayList<Image>> loadedSheets = new HashMap<>();
     protected double spriteHeight;
     protected double spriteWidth;
 
@@ -32,6 +35,8 @@ public class Sprite {
      */
     public Sprite(String path, int width, int height, int frameCount){
         currentIndex = 0;
+        currentAnim = 0;
+        animOffsets = new int[]{0};
         pos = new double[]{0,0};
         this.height = height;
         this.width = width;
@@ -51,6 +56,8 @@ public class Sprite {
      */
     public Sprite(String path, int width, int height, int frameCount, int spriteWidth, int spriteHeight){
         currentIndex = 0;
+        currentAnim = 0;
+        animOffsets = new int[]{0};
         pos = new double[]{0,0};
         this.height = height;
         this.width = width;
@@ -83,7 +90,7 @@ public class Sprite {
      * @param g GraphicsContext object to draw onto.
      */
     public void draw(GraphicsContext g){
-        g.drawImage(sheet,arrayOfIndexes.get(currentIndex).doubleValue(),
+        g.drawImage(spriteFrames.get(currentIndex),0.0,
                 0.0, width, height, pos[0], pos[1], spriteWidth, spriteHeight);
     }
 
@@ -100,27 +107,35 @@ public class Sprite {
      * Switches to the next clipping in spritesheet image, wrapping around to beginning at end.
      */
     protected void nextFrame(){
-        currentIndex = ++currentIndex%frameCount;
+        ++currentIndex;
+        if(animOffsets.length-1==currentAnim){
+            if(currentIndex == frameCount) currentIndex = animOffsets[currentAnim];
+        }else{
+            if(currentIndex == animOffsets[currentAnim+1]){
+                currentIndex = animOffsets[currentAnim];
+            }
+        }
     }
 
 
     private void loadSheet(String path, int frameCount){
 
         if(loadedSheets.containsKey(path)){
-            sheet = loadedSheets.get(path);
-            arrayOfIndexes = loadedSheetIndexes.get(path);
+            spriteFrames = loadedSheets.get(path);
         }else{
-            arrayOfIndexes = new ArrayList<Double>();
+            spriteFrames = new ArrayList<>();
             String spritePath = basePath+path;
 
-            sheet = new Image(this.getClass().getResourceAsStream(spritePath));
+            Image base = new Image(this.getClass().getResourceAsStream(spritePath));
+            PixelReader reader = base.getPixelReader();
 
 
             for(int i = 0; i < frameCount; i++){
-                arrayOfIndexes.add((double) (i*width));
+                WritableImage frame = new WritableImage(reader, (i*width),0, width, height);
+                spriteFrames.add(frame);
             }
-            loadedSheets.put(path, sheet);
-            loadedSheetIndexes.put(path, arrayOfIndexes);
+            loadedSheets.put(path, spriteFrames);
+
         }
 
     }

@@ -3,12 +3,15 @@ package view;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.PerspectiveTransform;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public class PlayerCard extends Sprite{
 
+    private double shimmerSpeed;
     private boolean initialized;
     private int health;
     private int energy;
@@ -27,6 +30,14 @@ public class PlayerCard extends Sprite{
     private double[][] transformRightBottom;
     private double[][] transformRightTop;
     private double currentIndexFractional;
+    private double shimmerTime;
+    private double shimmerInterval;
+    private boolean shimmerOn;
+    private double shimmerPercentage;
+    private boolean isSecondCheck;
+    private double shimmerAngle;
+    private boolean shimmered;
+
 
     public PlayerCard(GameBoard board) {
         super("playerCard.png", 180, 250, 96, 180, 250);
@@ -38,6 +49,12 @@ public class PlayerCard extends Sprite{
         transSpeed = 30;
         currentAnim = 0;
         animOffsets = new int[]{0,50};
+        shimmerOn = false;
+        shimmerPercentage = 0;
+        shimmerSpeed = 230;
+        isSecondCheck = false;
+        shimmerAngle = 44;
+        shimmered = false;
     }
 
     private void setupTransforms() {
@@ -87,16 +104,47 @@ public class PlayerCard extends Sprite{
         transfCanvas.setCache(false);
         transContext.drawImage(spriteFrames.get(currentIndex), 0.0,
                 0.0, width, height, 0, 0, spriteWidth, spriteHeight);
-
+        if(shimmerOn){
+            double x = 175*shimmerPercentage/100;
+            double y = 220*shimmerPercentage/100;
+            double distance = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+            if(y>108) distance = Math.sqrt(Math.pow(175-x,2) + Math.pow(220-y,2));
+            double xDelta = distance*Math.sin(Math.toRadians(shimmerAngle));
+            double yDelta = distance*Math.cos(Math.toRadians(shimmerAngle));
+            double endX = x + xDelta;
+            double endY = y - yDelta;
+            double startX = x - xDelta;
+            double startY = y + yDelta;
+           // transContext.fillRect(startX,startY, 10, 10);
+            //transContext.fillRect(x,y, 5, 5);
+            //transContext.fillRect(endX,endY, 10, 10);
+            transContext.setGlobalBlendMode(BlendMode.SRC_ATOP);
+            transContext.setStroke(Color.WHITE);
+            transContext.setGlobalAlpha(0.9);
+            BoxBlur blur = new BoxBlur();
+            blur.setWidth(10);
+            blur.setHeight(10);
+            blur.setIterations(1);
+            transContext.setEffect(blur);
+            //transContext.setLineCap(StrokeLineCap.ROUND);
+            //transContext.setLineJoin(StrokeLineJoin.ROUND);
+            transContext.setLineWidth(8);
+            transContext.strokeLine(startX,startY,endX,endY);
+        }
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.TRANSPARENT);
-
-        g.drawImage(transfCanvas.snapshot(params, null), pos[0], pos[1]);
+        WritableImage snapshot = transfCanvas.snapshot(params, null);
+        //if(shimmerOn) drawShimmer(snapshot);
+        g.drawImage(snapshot, pos[0], pos[1]);
         if(initialized){
             g.setFill(Color.LIGHTGREEN);
             g.fillText(health+"", pos[0]+spriteWidth*0.36,pos[1]+spriteHeight*0.97);
             g.fillText(energy+"", pos[0]+spriteWidth*0.65,pos[1]+spriteHeight*0.97);
         }
+    }
+
+    private void drawShimmer(WritableImage snapshot) {
+        //PixelReader
     }
 
     public void initialize(int playerEnergy, int playerHealth){
@@ -118,10 +166,32 @@ public class PlayerCard extends Sprite{
         int FPS = 20;
         double deltaFactor = delta/1000000000;
         double[] mousePos = boardHandle.getMousePos();
+        if(shimmerOn){
+            shimmerPercentage =  (shimmerPercentage + deltaFactor*shimmerSpeed);
+            if(shimmerPercentage > 100){
+                if(isSecondCheck){
+                    shimmerPercentage = 0;
+                    shimmerOn = false;
+                    isSecondCheck = false;
+                }else {
+                    shimmerPercentage = 100;
+                    isSecondCheck = true;
+                }
+            }
+        }
         if(mousePos[0] < pos[0] || mousePos[0] > pos[0] + spriteWidth || mousePos[1] < pos[1]){
             applyTransform(deltaFactor, originals);
+            shimmered = false;
         }
-        else calculatePerspectives(mousePos, deltaFactor);
+        else{
+            calculatePerspectives(mousePos, deltaFactor);
+
+            if(!shimmerOn && !shimmered){
+                shimmerOn = true;
+                shimmered = true;
+            }
+
+        }
         currentIndexFractional += delta/(1000000000/FPS);
         if(currentIndexFractional >= currentIndex+1) {
             nextFrame();
